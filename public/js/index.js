@@ -1,14 +1,14 @@
 let transactions = [];
 let myChart;
-
+const successEl = document.querySelector('#success-msg');
+const offlineEl = document.querySelector('#offline-msg');
+//on document load fetch transactions
 fetch("/api/transaction")
-  .then(response => {
-    return response.json();
-  })
+  .then(response => response.json())
   .then(data => {
     // save db data on global variable
     transactions = data;
-
+    //populate areas of the DOM 
     populateTotal();
     populateTable();
     populateChart();
@@ -46,14 +46,15 @@ function populateChart() {
   let sum = 0;
 
   // create date labels for chart
-  let labels = reversed.map(t => {
-    let date = new Date(t.date);
+  let labels = reversed.map(transaction => {
+    console.log(transaction);
+    let date = new Date(transaction.date);
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   });
 
   // create incremental values for chart
-  let data = reversed.map(t => {
-    sum += parseInt(t.value);
+  let data = reversed.map(transaction => {
+    sum += parseInt(transaction.value);
     return sum;
   });
 
@@ -63,21 +64,46 @@ function populateChart() {
   }
 
   let ctx = document.getElementById("myChart").getContext("2d");
-
-  myChart = new Chart(ctx, {
-    type: 'line',
-      data: {
+  myChart = new Chart
+  (ctx, 
+    {
+      type: 'bar',
+      data: 
+      {
         labels,
-        datasets: [{
+        datasets: [
+          {
             label: "Total Over Time",
             fill: true,
             backgroundColor: "#6666ff",
             data
-        }]
+          }
+        ]
+      },
+      options: {
+        legend: {
+          labels: {
+            fontColor: 'black'
+          }
+        }
+      }
     }
-  });
+  );
 }
+Chart.defaults.global.defaultFontColor = 'black';
 
+/**
+ * 1. validates if the form is filled and sends DOM error message to user who must enter something in the text fields to submit.
+ * 
+ * 2. creates transaction object from the transaction name, value, and date of creation
+ * 
+ * 3. if transaction is subtracting convert to negative number before unshifting on the beginning of the transactions array, else unshift the positive number on the beginning of the array
+ * 
+ * 4. update the UI with new data
+ * 
+ * 5. JSON stringify the transaction object to either the online mongoDB or the offline indexedDB
+ * @param {Boolean} isAdding 
+ */
 function sendTransaction(isAdding) {
   let nameEl = document.querySelector("#t-name");
   let amountEl = document.querySelector("#t-amount");
@@ -86,6 +112,8 @@ function sendTransaction(isAdding) {
   // validate form
   if (nameEl.value === "" || amountEl.value === "") {
     errorEl.textContent = "Missing Information";
+    nameEl.value = '';
+    amountEl.value = '';
     return;
   }
   else {
@@ -113,34 +141,68 @@ function sendTransaction(isAdding) {
   populateTotal();
   
   // also send to server
-  fetch("/api/transaction", {
-    method: "POST",
-    body: JSON.stringify(transaction),
-    headers: {
-      Accept: "application/json, text/plain, */*",
-      "Content-Type": "application/json"
+  fetch
+  ("/api/transaction", 
+    {
+      method: "POST",
+      body: JSON.stringify(transaction),
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      }
     }
-  })
-  .then(response => {    
-    return response.json();
-  })
-  .then(data => {
-    if (data.errors) {
-      errorEl.textContent = "Missing Information";
-    }
-    else {
-      // clear form
-      nameEl.value = "";
-      amountEl.value = "";
-    }
-  })
-  .catch(err => {
-    // fetch failed, so save in indexed db
-    saveRecord(transaction);
+  )
+  .then(response => {
+    if (response.ok) {
+      //show successful transaction notification in the DOM
+      console.log("showing success message");
+      successEl.classList.remove('hide-before-success');
+      successEl.classList.add('show-after-success');
 
+    }
+    return response.json()
+  })
+  .then(
+    () => {
+      //clear text fields
+      nameEl.value = '';
+      amountEl.value = '';
+      //hide DOM notification after some time
+      setTimeout(
+        () => {
+          console.log("hiding success message");
+          successEl.classList.remove('show-after-success');
+          successEl.classList.add('hide-before-success');
+        }, 3000
+      )
+    }
+  )
+  .catch(err => {
+    console.log(err);
+    // fetch failed, so save in indexed db
+    console.log("fetch failed so storing in indexedDB");
+    saveRecord(transaction);
     // clear form
     nameEl.value = "";
     amountEl.value = "";
+    //still show success notification when saving to indexed db and hide after some time
+    Promise.resolve()
+    .then(//show offline message
+      () => {
+        offlineEl.classList.remove('hide-before-success');
+        offlineEl.classList.add('show-after-success');
+      }
+    )
+    .then(//hide offline msg after some time
+      () => {
+        setTimeout(
+          () => {
+            offlineEl.classList.remove('show-after-success');
+            offlineEl.classList.add('hide-before-success');
+          }, 3000
+        )
+      }
+    )
   });
 }
 

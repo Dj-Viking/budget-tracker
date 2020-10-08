@@ -1,6 +1,7 @@
 body {
   font-size: 120%;
   font-family: Arial;
+  background-color: rgb(168, 162, 255);
 }
 
 button, input {
@@ -48,4 +49,14 @@ tr:nth-child(even) {
   overflow: auto;
   width: 90%;
   margin: 0 auto;
+}
+
+.hide-before-success {
+  color: green;
+  display: none;
+}
+
+.show-after-success {
+  color: green;
+  display: block;
 }
