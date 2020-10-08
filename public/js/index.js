@@ -174,7 +174,7 @@ function sendTransaction(isAdding) {
           successEl.classList.remove('show-after-success');
           successEl.classList.add('hide-before-success');
         }, 3000
-      )
+      );
     }
   )
   .catch(err => {
@@ -199,10 +199,11 @@ function sendTransaction(isAdding) {
           () => {
             offlineEl.classList.remove('show-after-success');
             offlineEl.classList.add('hide-before-success');
-          }, 3000
-        )
+          }, 5000
+        );
       }
     )
+    .catch(e => console.log(e));
   });
 }
 
