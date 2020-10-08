@@ -18,5 +18,7 @@ THEN
 
 
 * [x] add indexed db to save data while offline and upload to server database when back online
-* [] create service worker to service static assets while offline
-* [] create manifest.json file for pwa installation onto a user's phone homescreen
+* [x] create service worker to service static assets while offline
+* [x] create manifest.json file for pwa installation onto a user's phone homescreen
+
+* [] deploy to heroku with mongoDB database connected to heroku deployment
