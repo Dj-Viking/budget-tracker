@@ -101,8 +101,9 @@ Chart.defaults.global.defaultFontColor = 'black';
  * 
  * 4. update the UI with new data
  * 
- * 5. JSON stringify the transaction object to either the online mongoDB or the offline indexedDB
- * @param {Boolean} isAdding 
+ * 5. JSON stringify the transaction object to either the online mongoDB or if app is offline, save the transaction into the indexedDB storage in the browser
+ * @param {Boolean} isAdding Boolean
+ * @returns Void
  */
 function sendTransaction(isAdding) {
   let nameEl = document.querySelector("#t-name");

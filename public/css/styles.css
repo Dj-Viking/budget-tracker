@@ -4,6 +4,17 @@ body {
   background-color: #a8a2ff;
 }
 
+.flex-inputs {
+  display: flex;
+  justify-content: center;
+}
+
+.input-flex {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
 button, input {
   font-size: 100%;
   font-family: Arial;
@@ -35,7 +46,6 @@ tr:nth-child(even) {
 
 .total {
   font-size: 150%;
-  text-decoration: underline;
 }
 
 .form {

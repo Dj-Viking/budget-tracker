@@ -1,8 +1,8 @@
 const PATHS_TO_CACHE = [
   './',
   './manifest.json',
-  './index.html',
   './css/styles.css',
+  './index.html',
   './js/index.js',
   './js/idb.js',
   './icons/icon-72x72.png',
