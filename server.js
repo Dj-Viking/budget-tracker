@@ -25,5 +25,5 @@ mongoose.connect(MONGODB_URI, {
 app.use(require("./routes/api.js"));
 
 app.listen(PORT, () => {
-  console.log("\x1b[33m", `🔮  App running on http://localhost:${PORT}! 🔮 `, "\x1b[00m");
+  console.log("\x1b[33m", `🔮  App running on port ${PORT}! 🔮 `, "\x1b[00m");
 });
