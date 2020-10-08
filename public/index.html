@@ -17,22 +17,22 @@
 <body>
   <div class="wrapper">
     <div class="total">
-      <div class="total">Your total is: $<span id="total">0</span></div>
+      <div class="total">Your total 💰 is: $<span id="total">0</span></div>
     </div>
 
     <section class="form">
       <div class="flex-inputs">
         <div class="input-flex">
           <label for="t-name">Name of Transaction</label>
-          <input type="text" id="t-name" placeholder="Name" />
+          <input class="input-box" type="text" id="t-name" placeholder="Name" />
+          <button class="transact-add-btn" id="add-btn"><i class="fa fa-plus buttons"></i> Deposit</button>
         </div>
         <div class="input-flex">
           <label for="t-amount">Transaction Amount</label>
-          <input type="number" min="0" id="t-amount" placeholder="Amount" />
+          <input class="input-box" type="number" min="0" id="t-amount" placeholder="$ Amount" />
+          <button class="transact-sub-btn" id="sub-btn"><i class="fa fa-minus"></i> Withdraw</button>
         </div>
       </div>
-      <button id="add-btn"><i class="fa fa-plus buttons"></i> Add Funds</button>
-      <button id="sub-btn"><i class="fa fa-minus"></i> Subtract Funds</button>
       <p class="error"></p>
     </section>
     <p id="success-msg" class="hide-before-success">Transaction Success</p>

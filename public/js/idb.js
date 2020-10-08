@@ -3,17 +3,16 @@ const request = indexedDB.open('budget', 1);
 
 request.onupgradeneeded = event => {
   //reference to the indexedDB
-  console.log("========== ON UPGRADE NEEDED ==========");
-  console.log(event.target);
-  console.log(event.target.result);
+  //console.log("========== ON UPGRADE NEEDED ==========");
+  //console.log(event.target);
+  //console.log(event.target.result);
   const db = event.target.result;
   //create object store
   db.createObjectStore('new_transact', { autoIncrement: true });
 };
 
 request.onsuccess = event => {
-  console.log("==========  INDEXEDDB CREATED SUCCESS ==========");
-  console.log
+  //console.log("==========  INDEXEDDB CREATED SUCCESS ==========");
   //when db is successfully created with the object store
   dbDYN = event.target.result;
   if (navigator.onLine) {
@@ -21,13 +20,9 @@ request.onsuccess = event => {
   }
 };
 
-if (!navigator.onLine) {
-  console.log("**** NAVIGATOR OFFLINE ****");
-}
-
 request.onerror = event => {
   //log error 
-  console.log("========== ON ERROR ==========");
+  //console.log("========== ON ERROR ==========");
   console.log(event.target.errorCode);
 };
 
@@ -55,7 +50,7 @@ const uploadTransact = () => {
 
   //on success of this .getAll() transaction run this func
   allTransact.onsuccess = () => {
-    console.log("========== BACK ONLINE CONNECTED TO MONGODB ==========");
+    //console.log("========== BACK ONLINE CONNECTED TO MONGODB ==========");
     //if there was data in the idb's store send it to api server
     if (allTransact.result.length > 0) {
       fetch('/api/transaction',
@@ -69,8 +64,8 @@ const uploadTransact = () => {
         } 
       )
       .then(response => {
-        console.log("========== RESPONSE FROM INDEXEDDB POST REQUEST ==========");
-        console.log(response);
+        //console.log("========== RESPONSE FROM INDEXEDDB POST REQUEST ==========");
+        //console.log(response);
         return response.json();
       })
       .then(json => {
@@ -81,7 +76,7 @@ const uploadTransact = () => {
         const transactObjectStore = transaction.objectStore('new_transact');
         transactObjectStore.clear();
 
-        console.log('========== OBJECT STORE CLEAR ==========');
+        //console.log('========== OBJECT STORE CLEAR ==========');
       })
       .catch(err => console.log(err));
     }

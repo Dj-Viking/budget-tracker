@@ -23,12 +23,12 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
     .then(
       (cache) => {
-        console.log('installing cache : ' + CACHE_NAME);
+        //console.log('installing cache : ' + CACHE_NAME);
         caches.open(CACHE_NAME)
         
         //log the cache creation
-        .then(cache => cache.keys()).then(requests => requests.map(request => request.url))
-        .then(console.log)
+        // .then(cache => cache.keys()).then(requests => requests.map(request => request.url))
+        // .then(console.log)
         
         return cache.addAll(PATHS_TO_CACHE);
       }
@@ -49,7 +49,7 @@ self.addEventListener('activate', (event) => {
           keyList.map(
             (key, i) => {
               if (cacheKeepList.indexOf(key) === -1) {
-                console.log('deleting cache : ' + keyList[i]);
+                //console.log('deleting cache : ' + keyList[i]);
                 return caches.delete(keyList[i]);
               }
             }
@@ -67,18 +67,18 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request)
     .then(
       request => {
-        console.log("====== REQUEST BEING RETURNED FROM .match(event.request) ======");
-        console.log(request);
+       // console.log("====== REQUEST BEING RETURNED FROM .match(event.request) ======");
+        //console.log(request);
         if (request) {
-          console.log("====== RESPONDING WITH CACHE PATH : " + event.request.url);
+          //console.log("====== RESPONDING WITH CACHE PATH : " + event.request.url);
           return request;
         } else {
-          console.log("====== FILE PATH IS NOT CACHED, FETCHING : " + event.request.url);
+          //console.log("====== FILE PATH IS NOT CACHED, FETCHING : " + event.request.url);
           return fetch(event.request);
         }
       }
     )
-    .then(response => { console.log(response); return Promise.resolve(response); })
+    .then(response => { /*console.log(response);*/ return Promise.resolve(response); })
     .catch(e => console.log(e))
   );
 });

@@ -2,26 +2,27 @@ let transactions = [];
 let myChart;
 const successEl = document.querySelector('#success-msg');
 const offlineEl = document.querySelector('#offline-msg');
+const roundNum = (value, decimalPlaces) => Number(Math.round(value+'e'+decimalPlaces)+'e-'+decimalPlaces);
 //on document load fetch transactions
 fetch("/api/transaction")
-  .then(response => response.json())
-  .then(data => {
-    // save db data on global variable
-    transactions = data;
-    //populate areas of the DOM 
-    populateTotal();
-    populateTable();
-    populateChart();
-  });
-
+.then(response => response.json())
+.then(data => {
+  // save db data on global variable
+  transactions = data;
+  //populate areas of the DOM 
+  populateTotal();
+  populateTable();
+  populateChart();
+});
+  
 function populateTotal() {
   // reduce transaction amounts to a single total value
   let total = transactions.reduce((total, t) => {
-    return total + parseInt(t.value);
+    return total + roundNum(Number(t.value), 2);
   }, 0);
-
+  //add commas to the number string for display, round decimal numbers to nearest hundreds place
   let totalEl = document.querySelector("#total");
-  totalEl.textContent = total;
+  totalEl.textContent = numberWithCommas(total);
 }
 
 function populateTable() {
@@ -33,7 +34,7 @@ function populateTable() {
     let tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${transaction.name}</td>
-      <td>${transaction.value}</td>
+      <td>${numberWithCommas(roundNum(Number(transaction.value), 2))}</td>
     `;
 
     tbody.appendChild(tr);
@@ -53,8 +54,8 @@ function populateChart() {
   });
 
   // create incremental values for chart
-  let data = reversed.map(transaction => {
-    sum += parseInt(transaction.value);
+  let data = reversed.map(t => {
+    sum += roundNum(Number(t.value), 2)
     return sum;
   });
 
@@ -156,7 +157,7 @@ function sendTransaction(isAdding) {
   .then(response => {
     if (response.ok) {
       //show successful transaction notification in the DOM
-      console.log("showing success message");
+      //console.log("showing success message");
       successEl.classList.remove('hide-before-success');
       successEl.classList.add('show-after-success');
 
@@ -171,7 +172,7 @@ function sendTransaction(isAdding) {
       //hide DOM notification after some time
       setTimeout(
         () => {
-          console.log("hiding success message");
+          //console.log("hiding success message");
           successEl.classList.remove('show-after-success');
           successEl.classList.add('hide-before-success');
         }, 3000
@@ -181,7 +182,7 @@ function sendTransaction(isAdding) {
   .catch(err => {
     console.log(err);
     // fetch failed, so save in indexed db
-    console.log("fetch failed so storing in indexedDB");
+    //console.log("fetch failed so storing in indexedDB");
     saveRecord(transaction);
     // clear form
     nameEl.value = "";
@@ -215,3 +216,34 @@ document.querySelector("#add-btn").onclick = function() {
 document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
 };
+
+
+/**
+ * 
+ * @param {Number} num number that needs commas placed in the string
+ * @returns string
+ */
+function numberWithCommas(num) {
+  let parts = num.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  //console.log(parts);
+  //if only a tens place fill in hundredths place with zero and splice off the extra if its not a zero
+  if (parts.length === 2) {
+    parts.splice(1, 0, parts[1] + "0");
+    parts.splice(2);
+    if (parts[1].length > 2) {
+      //pop last number and manipulate it to take out the stuff after hundreds place
+      let decimals = parts.pop().split('');
+      //console.log(decimals);
+      //splice out anything past second index
+      decimals.splice(2);
+      //console.log(decimals);
+      let joinedDec = decimals.join('');
+      //console.log(joinedDec);
+      //push joined dec into parts array
+      parts.push(joinedDec);
+    }
+  }
+  //console.log(parts);
+  return parts.join('.');
+}
