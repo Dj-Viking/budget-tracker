@@ -22,7 +22,7 @@ function populateTotal() {
   }, 0);
   //add commas to the number string for display, round decimal numbers to nearest hundreds place
   let totalEl = document.querySelector("#total");
-  totalEl.textContent = numberWithCommas(total);
+  totalEl.textContent = `$${numberWithCommas(total)}`;
 }
 
 function populateTable() {
@@ -34,7 +34,7 @@ function populateTable() {
     let tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${transaction.name}</td>
-      <td>${numberWithCommas(roundNum(Number(transaction.value), 2))}</td>
+      <td>$${numberWithCommas(roundNum(Number(transaction.value), 2))}</td>
     `;
 
     tbody.appendChild(tr);

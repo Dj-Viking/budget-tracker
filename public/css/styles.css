@@ -93,3 +93,13 @@ tr:nth-child(even) {
   color: green;
   display: block;
 }
+
+.chartjs-render-monitor {
+  height: 50% !important;
+}
+
+@media screen and (max-width: 400px) {
+  .input-flex {
+    width: 45%;
+  }
+}

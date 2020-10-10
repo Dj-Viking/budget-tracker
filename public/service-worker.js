@@ -1,4 +1,4 @@
-const PATHS_TO_CACHE = [
+const FILES_TO_CACHE = [
   './',
   './manifest.json',
   './css/styles.css',
@@ -17,30 +17,61 @@ const PATHS_TO_CACHE = [
 const APP_PREFIX = 'BudgetTracker-';
 const VERSION = 'v1';
 const CACHE_NAME = APP_PREFIX + VERSION;
+const DATA_CACHE = 'data-BudgetTracker' + VERSION;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-    .then(
-      (cache) => {
-        //console.log('installing cache : ' + CACHE_NAME);
+  // console.log(event);
+  Promise.resolve()
+  .then
+  (
+    () => {
+      event.waitUntil(
+        caches.open(DATA_CACHE)
+        .then
+        (
+          cache => {
+            console.log('fetching the transactions from api at serviceworker install time');
+            return fetch('/api/transaction')
+            .then
+            (
+              response => {
+                // If the response was good, clone it and store it in the cache.
+                if (response.status === 200) {
+                  cache.put('/api/transaction', response.clone());
+                }
+                return response;
+              }
+            )
+            .catch(e => console.log(e));
+          }
+        )
+        .catch(e => console.log(e))
+      );
+    }
+  )
+  .then
+  (
+    () => {
+      event.waitUntil(
         caches.open(CACHE_NAME)
-        
-        //log the cache creation
-        // .then(cache => cache.keys()).then(requests => requests.map(request => request.url))
-        // .then(console.log)
-        
-        return cache.addAll(PATHS_TO_CACHE);
-      }
-    )
-    .catch(e => console.log(e))
+        .then
+        (
+          cache => {
+            console.log('Your files were pre-cached successfully!');
+            return cache.addAll(FILES_TO_CACHE);
+          }
+        )
+        .catch(e => console.log(e))
+      );
+    }
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-    .then(
+    .then
+    (
       keyList => {
         let cacheKeepList = keyList.filter(key => key.indexOf(APP_PREFIX));
         cacheKeepList.push(CACHE_NAME);
@@ -61,24 +92,46 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+//intercept fetch requests
 self.addEventListener('fetch', (event) => {
-  //console.log('fetch request : ' + event.request.url);
-  event.respondWith(
-    caches.match(event.request)
-    .then(
-      request => {
-       // console.log("====== REQUEST BEING RETURNED FROM .match(event.request) ======");
-        //console.log(request);
-        if (request) {
-          //console.log("====== RESPONDING WITH CACHE PATH : " + event.request.url);
-          return request;
-        } else {
-          //console.log("====== FILE PATH IS NOT CACHED, FETCHING : " + event.request.url);
-          return fetch(event.request);
+  if (event.request.url.includes('/api/')) {
+    console.log(event.request.url);
+    event.respondWith(
+      caches.open(DATA_CACHE)
+      .then
+      (
+        cache => { 
+          return fetch(event.request).then((response) => {
+            if (response.status === 200) {
+              cache.put(event.request.url, response.clone());//if api fetch was good clone the url and the response object
+            }
+            return response;
+          })
+          .catch(err => cache.match(event.request))//if request failed get the objects 
         }
-      }
-    )
-    .then(response => { /*console.log(response);*/ return Promise.resolve(response); })
-    .catch(e => console.log(e))
-  );
+      )
+      .catch(err => console.log(err))
+    );
+  } else {
+    //console.log('fetch request : ' + event.request.url);
+    event.respondWith(
+      caches.match(event.request)
+      .then
+      (
+        response => {
+         // console.log("====== RESPONSE BEING RETURNED FROM .match(event.request) ======");
+          //console.log(response);
+          if (response) {
+            //console.log("====== RESPONDING WITH CACHE PATH : " + event.request.url);
+            return response;
+          } else {
+            //console.log("====== FILE PATH IS NOT CACHED, FETCHING : " + event.request.url);
+            return fetch(event.request);
+          }
+        }
+      )
+      .then(response => { /*console.log(response);*/ return Promise.resolve(response); })
+      .catch(e => console.log(e))
+    );
+  }
 });
