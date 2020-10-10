@@ -1,24 +1,27 @@
 let dbDYN;
+console.log(sw);
+
 const request = indexedDB.open('budget', 1);
 
 request.onupgradeneeded = event => {
   //reference to the indexedDB
-  //console.log("========== ON UPGRADE NEEDED ==========");
-  //console.log(event.target);
-  //console.log(event.target.result);
+  console.log("========== ON UPGRADE NEEDED ==========");
+  console.log(event.target);
+  console.log(event.target.result);
   const db = event.target.result;
   //create object store
   db.createObjectStore('new_transact', { autoIncrement: true });
 };
 
 request.onsuccess = event => {
-  //console.log("==========  INDEXEDDB CREATED SUCCESS ==========");
+  console.log("==========  INDEXEDDB CREATED SUCCESS ==========");
   //when db is successfully created with the object store
   dbDYN = event.target.result;
   if (navigator.onLine) {
     uploadTransact();
   }
 };
+
 
 request.onerror = event => {
   //log error 
@@ -53,7 +56,7 @@ const uploadTransact = () => {
     //console.log("========== BACK ONLINE CONNECTED TO MONGODB ==========");
     //if there was data in the idb's store send it to api server
     if (allTransact.result.length > 0) {
-      fetch('/api/transaction',
+      fetch('/api/transaction/post',
         {
           method: 'POST',
           body: JSON.stringify(allTransact.result),
@@ -82,6 +85,7 @@ const uploadTransact = () => {
     }
   }
 }
+
 
 //listen for when app comes back online
 //when back online send items 

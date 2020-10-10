@@ -4,9 +4,10 @@ const successEl = document.querySelector('#success-msg');
 const offlineEl = document.querySelector('#offline-msg');
 const roundNum = (value, decimalPlaces) => Number(Math.round(value+'e'+decimalPlaces)+'e-'+decimalPlaces);
 //on document load fetch transactions
-fetch("/api/transaction")
+fetch("/api/transaction", {method: 'GET'})
 .then(response => response.json())
 .then(data => {
+  console.log(data);
   // save db data on global variable
   transactions = data;
   //populate areas of the DOM 
@@ -48,7 +49,7 @@ function populateChart() {
 
   // create date labels for chart
   let labels = reversed.map(transaction => {
-    console.log(transaction);
+    //console.log(transaction);
     let date = new Date(transaction.date);
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   });
@@ -68,7 +69,7 @@ function populateChart() {
   myChart = new Chart
   (ctx, 
     {
-      type: 'bar',
+      type: 'line',
       data: 
       {
         labels,
@@ -144,12 +145,12 @@ function sendTransaction(isAdding) {
   
   // also send to server
   fetch
-  ("/api/transaction", 
+  ("/api/transaction/post", 
     {
       method: "POST",
       body: JSON.stringify(transaction),
       headers: {
-        Accept: "application/json, text/plain, */*",
+        Accept: "application/json",
         "Content-Type": "application/json"
       }
     }

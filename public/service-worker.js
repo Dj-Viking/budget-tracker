@@ -13,6 +13,7 @@ const FILES_TO_CACHE = [
   './icons/icon-192x192.png',
   './icons/icon-384x384.png',
   './icons/icon-512x512.png',
+  'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
 ];
 const APP_PREFIX = 'BudgetTracker-';
 const VERSION = 'v1';
@@ -35,7 +36,8 @@ self.addEventListener('install', (event) => {
             .then
             (
               response => {
-                // If the response was good, clone it and store it in the cache.
+                // If the response was good, 
+                // clone it and store it in the cache.
                 if (response.status === 200) {
                   cache.put('/api/transaction', response.clone());
                 }
@@ -102,7 +104,7 @@ self.addEventListener('fetch', (event) => {
       (
         cache => { 
           return fetch(event.request).then((response) => {
-            if (response.status === 200) {
+            if (response.status === 200 && event.request.method === 'GET') {
               cache.put(event.request.url, response.clone());//if api fetch was good clone the url and the response object
             }
             return response;
