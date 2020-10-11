@@ -1,7 +1,42 @@
 body {
   font-size: 120%;
   font-family: Arial;
+  background-color: #a8a2ff;
 }
+
+.flex-inputs {
+  display: flex;
+  justify-content: center;
+}
+
+.input-flex {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.input-box {
+  padding: 10px 0;
+}
+
+.transact-add-btn {
+  padding: 10px 0;
+  margin-top: 30px;
+  color: green;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.transact-sub-btn {
+  padding: 10px 0;
+  margin-top: 30px;
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.transact
 
 button, input {
   font-size: 100%;
@@ -34,7 +69,6 @@ tr:nth-child(even) {
 
 .total {
   font-size: 150%;
-  text-decoration: underline;
 }
 
 .form {
@@ -48,4 +82,24 @@ tr:nth-child(even) {
   overflow: auto;
   width: 90%;
   margin: 0 auto;
+}
+
+.hide-before-success {
+  color: green;
+  display: none;
+}
+
+.show-after-success {
+  color: green;
+  display: block;
+}
+
+.chartjs-render-monitor {
+  height: 50% !important;
+}
+
+@media screen and (max-width: 400px) {
+  .input-flex {
+    width: 45%;
+  }
 }

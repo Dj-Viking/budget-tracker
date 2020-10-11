@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="theme-color" content="#317EFB">
+  <meta name="theme-color" content="#a8a2ff">
+  <meta name="Description" content="An app that allows you to track your budget over time.">
   <link rel="shortcut icon" href="icons/icon-192x192.png" type="image/x-icon">
-
+  <link rel="apple-touch-icon" href="../public/icons/icon-192x192.png">
+  <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="css/styles.css">
 
@@ -15,16 +17,26 @@
 <body>
   <div class="wrapper">
     <div class="total">
-      <div class="total">Your total is: $<span id="total">0</span></div>
+      <div class="total">Your total 💰 is: <span id="total">0</span></div>
     </div>
 
-    <div class="form">
-      <input type="text" id="t-name" placeholder="Name of transaction" />
-      <input type="number" min="0" id="t-amount" placeholder="Transaction amount" />
-      <button id="add-btn"><i class="fa fa-plus buttons"></i> Add Funds</button>
-      <button id="sub-btn"><i class="fa fa-minus"></i> Subtract Funds</button>
+    <section class="form">
+      <div class="flex-inputs">
+        <div class="input-flex">
+          <label for="t-name">Name of Transaction</label>
+          <input class="input-box" type="text" id="t-name" placeholder="Name" />
+          <button class="transact-add-btn" id="add-btn"><i class="fa fa-plus buttons"></i> Deposit</button>
+        </div>
+        <div class="input-flex">
+          <label for="t-amount">Transaction Amount</label>
+          <input class="input-box" type="number" min="0" id="t-amount" placeholder="$ Amount" />
+          <button class="transact-sub-btn" id="sub-btn"><i class="fa fa-minus"></i> Withdraw</button>
+        </div>
+      </div>
       <p class="error"></p>
-    </div>
+    </section>
+    <p id="success-msg" class="hide-before-success">Transaction Success</p>
+    <p id="offline-msg" class="hide-before-success">🌎 Internet connection lost, but you can still post entries! 👍</p>
 
     <div class="transactions">
       <table>
@@ -42,6 +54,22 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <script>
+    //service worker registration
+    function sw() {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('./service-worker.js')
+        .then(
+          () => {
+            console.log("service worker registered successfully");
+          }
+        )
+        .catch(error => console.log("service worker registration failed", error));
+      }
+    };
+    sw();
+  </script>
+  <script src="js/idb.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>
