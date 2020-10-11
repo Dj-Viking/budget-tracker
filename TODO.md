@@ -21,4 +21,4 @@ THEN
 * [x] create service worker to service static assets while offline
 * [x] create manifest.json file for pwa installation onto a user's phone homescreen
 
-* [] deploy to heroku with mongoDB database connected to heroku deployment
+* [x] deploy to heroku with mongoDB database connected to heroku deployment
