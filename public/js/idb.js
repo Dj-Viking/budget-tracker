@@ -1,5 +1,5 @@
 let dbDYN;
-console.log(sw);
+//console.log(sw);
 
 const request = indexedDB.open('budget', 1);
 
