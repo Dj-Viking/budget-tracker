@@ -1,6 +1,6 @@
 let dbDYN;
 //console.log(sw);
-
+const roundNum = (value, decimalPlaces) => Number(Math.round(value+'e'+decimalPlaces)+'e-'+decimalPlaces);
 const request = indexedDB.open('budget', 1);
 
 request.onupgradeneeded = event => {
@@ -81,12 +81,132 @@ const uploadTransact = () => {
 
         //console.log('========== OBJECT STORE CLEAR ==========');
       })
+      //once back online make a get after posting the stored stuff in idb to store in the cache after coming back online
+      .then(() => {
+      return fetch('/api/transaction', {method: 'get'})
+      })
+      .then(response => response.json())
+      .then(
+        json => {
+          console.log(json);
+          // save db json on global variable
+          transactions = json;
+          //populate areas of the DOM 
+          populateTotal();
+          populateTable();
+          populateChart();
+        }
+      )
       .catch(err => console.log(err));
     }
   }
 }
+function populateTotal() {
+  // reduce transaction amounts to a single total value
+  let total = transactions.reduce((total, t) => {
+    return total + roundNum(Number(t.value), 2);
+  }, 0);
+  //add commas to the number string for display, round decimal numbers to nearest hundreds place
+  let totalEl = document.querySelector("#total");
+  totalEl.textContent = `$${numberWithCommas(total)}`;
+}
+function populateTable() {
+  let tbody = document.querySelector("#tbody");
+  tbody.innerHTML = "";
 
+  transactions.forEach(transaction => {
+    // create and populate a table row
+    let tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${transaction.name}</td>
+      <td>$${numberWithCommas(roundNum(Number(transaction.value), 2))}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+function populateChart() {
+  // copy array and reverse it
+  let reversed = transactions.slice().reverse();
+  let sum = 0;
+
+  // create date labels for chart
+  let labels = reversed.map(transaction => {
+    //console.log(transaction);
+    let date = new Date(transaction.date);
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  });
+
+  // create incremental values for chart
+  let data = reversed.map(t => {
+    sum += roundNum(Number(t.value), 2)
+    return sum;
+  });
+
+  // remove old chart if it exists
+  if (myChart) {
+    myChart.destroy();
+  }
+
+  let ctx = document.getElementById("myChart").getContext("2d");
+  myChart = new Chart
+  (ctx, 
+    {
+      type: 'line',
+      data: 
+      {
+        labels,
+        datasets: [
+          {
+            label: "Total Over Time",
+            fill: true,
+            backgroundColor: "#6666ff",
+            data
+          }
+        ]
+      },
+      options: {
+        legend: {
+          labels: {
+            fontColor: 'black'
+          }
+        }
+      }
+    }
+  );
+}
+Chart.defaults.global.defaultFontColor = 'black';
 
 //listen for when app comes back online
 //when back online send items 
 window.addEventListener('online', uploadTransact);
+
+/**
+ * 
+ * @param {Number} num number that needs commas placed in the string
+ * @returns string
+ */
+function numberWithCommas(num) {
+  let parts = num.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  //console.log(parts);
+  //if only a tens place fill in hundredths place with zero and splice off the extra if its not a zero
+  if (parts.length === 2) {
+    parts.splice(1, 0, parts[1] + "0");
+    parts.splice(2);
+    if (parts[1].length > 2) {
+      //pop last number and manipulate it to take out the stuff after hundreds place
+      let decimals = parts.pop().split('');
+      //console.log(decimals);
+      //splice out anything past second index
+      decimals.splice(2);
+      //console.log(decimals);
+      let joinedDec = decimals.join('');
+      //console.log(joinedDec);
+      //push joined dec into parts array
+      parts.push(joinedDec);
+    }
+  }
+  //console.log(parts);
+  return parts.join('.');
+}
