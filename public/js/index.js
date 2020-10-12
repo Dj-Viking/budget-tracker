@@ -2,7 +2,7 @@ let transactions = [];
 let myChart;
 const successEl = document.querySelector('#success-msg');
 const offlineEl = document.querySelector('#offline-msg');
-const roundNum = (value, decimalPlaces) => Number(Math.round(value+'e'+decimalPlaces)+'e-'+decimalPlaces);
+//const roundNum = (value, decimalPlaces) => Number(Math.round(value+'e'+decimalPlaces)+'e-'+decimalPlaces);
 //on document load fetch transactions
 fetch("/api/transaction", {method: 'GET'})
 .then(response => response.json())
@@ -178,6 +178,22 @@ function sendTransaction(isAdding) {
           successEl.classList.add('hide-before-success');
         }, 3000
       );
+    }
+    //fetch again to update the cache after posting
+  )
+  .then(() => {
+   return fetch('/api/transaction', {method: 'get'})
+  })
+  .then(response => response.json())
+  .then(
+    json => {
+      console.log(json);
+      // save db json on global variable
+      transactions = json;
+      //populate areas of the DOM 
+      populateTotal();
+      populateTable();
+      populateChart();
     }
   )
   .catch(err => {

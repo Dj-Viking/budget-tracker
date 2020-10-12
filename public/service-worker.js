@@ -70,6 +70,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+  console.log('service worker activate event');
   event.waitUntil(
     caches.keys()
     .then
@@ -92,6 +93,7 @@ self.addEventListener('activate', (event) => {
     )
     .catch(e => console.log(e))
   );
+  self.clients.claim();//need this to let the service worker take control of the page to start listening for fetch events
 });
 
 //intercept fetch requests
